@@ -8,6 +8,10 @@ public class Wordle {
         return wordle;
     }
 
+    public void setWordle(String wordle) {this.wordle = wordle;}
+
+    public Wordle() {};
+
     public Wordle(String wordle) {
         this.wordle = wordle;
     }
