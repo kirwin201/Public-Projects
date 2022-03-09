@@ -4,6 +4,7 @@ BEGIN TRANSACTION;
 
 
 DROP TABLE IF EXISTS member_team, member_record, final_standing CASCADE;
+DROP VIEW IF EXISTS records_with_names, standings_with_names;
 
 CREATE TABLE member_team
 (
@@ -82,20 +83,44 @@ INSERT INTO final_standing (season, first_place, second_place, third_place, four
 INSERT INTO final_standing (season, first_place, second_place, third_place, fourth_place) VALUES (2021, 10, 12, 3, 2);
 
 
--- SELECT statements used to check tables
+--CREATE VIEWs of joined tables
+
+CREATE VIEW records_with_names
+AS
+SELECT 
+	mt.member_id, 
+	mt.member_name, 
+	mt.team_name, 
+	mr.seasons, mr.wins, 
+	mr.loss, 
+	mr.draw 
+FROM 
+	member_team AS mt
+		INNER JOIN member_record AS mr ON mt.member_id = mr.member_id;
+
+CREATE VIEW standings_with_names
+AS
+SELECT ss.season, 
+	mt1.member_name AS first_place, 
+	mt2.member_name AS second_place, 
+	mt3.member_name AS thrid_place, 
+	mt4.member_name AS fourth_place 
+FROM 
+	final_standing AS ss
+		INNER JOIN member_team AS mt1 ON ss.first_place = mt1.member_id
+			INNER JOIN member_team AS mt2 ON ss.second_place = mt2.member_id
+				INNER JOIN member_team AS mt3 ON ss.third_place = mt3.member_id
+					INNER JOIN member_team AS mt4 ON ss.fourth_place = mt4.member_id;
+
+
+-- SELECT statements used to check tables and views
 
 SELECT * FROM member_team;
 SELECT * FROM member_record;
 SELECT * FROM final_standing;
 
-SELECT mt.member_id, mt.member_name, mt.team_name, mr.seasons, mr.wins, mr.loss, mr.draw FROM member_team AS mt
-	INNER JOIN member_record AS mr ON mt.member_id = mr.member_id;
-
-SELECT ss.season, mt1.member_name AS first_place, mt2.member_name AS second_place, mt3.member_name AS thrid_place, mt4.member_name AS fourth_place FROM final_standing AS ss
-	INNER JOIN member_team AS mt1 ON ss.first_place = mt1.member_id
-		INNER JOIN member_team AS mt2 ON ss.second_place = mt2.member_id
-			INNER JOIN member_team AS mt3 ON ss.third_place = mt3.member_id
-				INNER JOIN member_team AS mt4 ON ss.fourth_place = mt4.member_id;
+SELECT * FROM records_with_names;
+SELECT * FROM standings_with_names;
 
 
 --ROLLBACK TRANSACTION;
